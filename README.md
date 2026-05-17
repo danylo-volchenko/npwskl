@@ -14,11 +14,14 @@ Multi-lingual setups. I was tired of switching between 3 layouts when coding and
 Same functionality exists somewhere in the depths of GNOME compositor.
 
 ### How to build and install
-`cargo build -r` ->  `target/release/pwskl` (binary)
-`sudo cp target/release/pwskl /usr/bin/pwskl`
-or if you don't want to put it there:
-`cp target/release/pwskl ~/.local/bin/pwskl`
-just ensure `~/.local/bin/` is in your `echo $PATH`
+```sh
+cargo build -r ## ->  target/release/pwskl (binary)
+# install
+$ sudo cp target/release/pwskl /usr/bin/pwskl
+# or if you don't want to put it there:
+cp target/release/pwskl ~/.local/bin/pwskl
+# just ensure `~/.local/bin/` is in your `echo $PATH`
+```
 
 ### Usage
 Personally I have added `spawn-at-startup` to my config section, you can do whatever you want.
