@@ -2,11 +2,9 @@
 
 use std::collections::HashMap;
 
-pub mod nirievt;
-use nirievt::{
-	KeyboardLayoutsChanged,
-	WorkspacesChanged,
-};
+pub mod ipc;
+use ipc::*;
+use niri_ipc::{Action, LayoutSwitchTarget};
 
 pub struct PwsklState {
 	ws_layouts: HashMap<u64, u8>,
@@ -25,9 +23,9 @@ impl PwsklState
 		}
 	}
 
-	pub fn on_kb_layout_changed(&mut self, payload: &KeyboardLayoutsChanged)
+	pub fn on_kb_layout_changed(&mut self, keyboard_layouts: &niri_ipc::KeyboardLayouts)
 	{
-		self.curr_layout_idx = payload.keyboard_layouts.current_idx;
+		self.curr_layout_idx = keyboard_layouts.current_idx;
 		println!("Layout changed → idx {}", self.curr_layout_idx);
 		if let Some(ws_id) = self.curr_ws_idx {
 			self.ws_layouts.insert(ws_id, self.curr_layout_idx);
@@ -43,15 +41,15 @@ impl PwsklState
 		}
 	}
 
-	pub fn on_workspaces_changed(&mut self, payload: &WorkspacesChanged)
+	pub fn on_workspaces_changed(&mut self, workspaces: &[niri_ipc::Workspace])
 	{
-		if let Some(focused) = payload.workspaces.iter().find(|w| w.is_focused) {
+		if let Some(focused) = workspaces.iter().find(|w| w.is_focused) {
 			self.curr_ws_idx = Some(focused.id);
 			println!("[WorkspacesChanged] initial focused ws={}", focused.id);
 		}
 	}
 
-	pub fn on_workspace_activated(&mut self, id: u64, focused: bool)
+	pub fn on_workspace_activated(&mut self, id: u64, focused: bool, client: &mut NiriIPCClient)
 	{
 		println!("[WorkspaceActivated] id={id}, focused={focused}");
 		println!(
@@ -69,7 +67,7 @@ impl PwsklState
 					"  → RESTORING layout {saved} (currently {})",
 					self.curr_layout_idx
 				);
-				if nirievt::call_ipc("switch-layout", &saved.to_string()) {
+				if switch_layout(saved, client) {
 					self.curr_layout_idx = saved;
 				} else {
 					eprintln!("  →  IPC 'switch-layout' failed");
@@ -97,4 +95,11 @@ impl Default for PwsklState
 	{
 		Self::new()
 	}
+}
+
+pub fn switch_layout(idx: u8, client: &mut NiriIPCClient) -> bool
+{
+	client.send_action(Action::SwitchLayout {
+		layout: LayoutSwitchTarget::Index(idx),
+	})
 }

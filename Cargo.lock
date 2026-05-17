@@ -15,9 +15,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8ca58f447f06ed17d5fc4043ce1b10dd205e060fb3ce5b979b8ed8e59ff3f79"
 
 [[package]]
+name = "niri-ipc"
+version = "26.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a4adbddf4037ce047854d36a60b5bf80a7990b8db2f0a0b9ede7534b0bae09a"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "npwskl"
 version = "0.1.0"
 dependencies = [
+ "niri-ipc",
  "serde",
  "serde_json",
 ]

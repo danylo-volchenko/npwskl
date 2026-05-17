@@ -1,17 +1,19 @@
 // vim: set noet tw=4 sw=4
 
 use npwskl::*;
-use npwskl::nirievt::{NiriEvent, NiriEvtReader};
+use npwskl::ipc::{NiriIPCClient};
+use niri_ipc::Event;
 
-fn event_loop(reader: &mut nirievt::NiriEvtReader, state: &mut PwsklState)
+fn event_loop(client: &mut ipc::NiriIPCClient, state: &mut PwsklState)
 {
 	println!("Listening to Niri events...");
-	for event in reader {
+	while let Some(event) = client.next_event() {
 		match event {
-			NiriEvent::KeyboardLayoutsChanged(payload) => state.on_kb_layout_changed(&payload),
-			NiriEvent::KeyboardLayoutSwitched { idx } => state.on_kb_layout_switched(idx),
-			NiriEvent::WorkspacesChanged(payload) => state.on_workspaces_changed(&payload),
-			NiriEvent::WorkspaceActivated { id, focused } => state.on_workspace_activated(id, focused),
+			Event::KeyboardLayoutsChanged { keyboard_layouts } => { state.on_kb_layout_changed(&keyboard_layouts); }
+			Event::KeyboardLayoutSwitched { idx } => { state.on_kb_layout_switched(idx); }
+			Event::WorkspacesChanged { workspaces } => { state.on_workspaces_changed(&workspaces); }
+			Event::WorkspaceActivated { id, focused } => { state.on_workspace_activated(id, focused, client);}
+			_ => { },
 		}
 	}
 	println!("Event loop ended.");
@@ -20,7 +22,7 @@ fn event_loop(reader: &mut nirievt::NiriEvtReader, state: &mut PwsklState)
 fn main()
 {
 	let mut state = PwsklState::new();
-	let mut reader = NiriEvtReader::new();
+	let mut client = NiriIPCClient::new();
 
-	event_loop(&mut reader, &mut state);
+	event_loop(&mut client, &mut state);
 }
