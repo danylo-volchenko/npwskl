@@ -29,8 +29,6 @@ name = "npwskl"
 version = "0.1.0"
 dependencies = [
  "niri-ipc",
- "serde",
- "serde_json",
 ]
 
 [[package]]
