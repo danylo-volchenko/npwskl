@@ -6,7 +6,6 @@ use niri_ipc::Event;
 
 fn event_loop(client: &mut ipc::NiriIPCClient, state: &mut PwsklState)
 {
-	println!("Listening to Niri events...");
 	while let Some(event) = client.next_event() {
 		match event {
 			Event::KeyboardLayoutsChanged { keyboard_layouts } => { state.on_kb_layout_changed(&keyboard_layouts); }
@@ -16,7 +15,6 @@ fn event_loop(client: &mut ipc::NiriIPCClient, state: &mut PwsklState)
 			_ => { },
 		}
 	}
-	println!("Event loop ended.");
 }
 
 fn main()
